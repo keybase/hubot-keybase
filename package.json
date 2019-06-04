@@ -32,7 +32,7 @@
     },
     "main": "index.js",
     "dependencies": {
-        "keybase-bot": "file:../keybase-bot", 
+        "keybase-bot": "keybase/keybase-bot#pzduniak/safe-json-stringify",
         "hubot": "3"
     },
     "peerDependencies": {

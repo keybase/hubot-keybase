@@ -5,7 +5,7 @@ const Response = require.main.require('hubot/src/response')
 const msgs = require.main.require('hubot/src/message')
 const Bot = require('keybase-bot')
 
-const composeRoomName = (x) => {
+const convertChannelToRoom = (x) => {
   if (!x.topicName) {
     return x.name
   }
@@ -20,7 +20,7 @@ const membersCount = (name) => {
   return name.split(',').length
 }
 
-const convertToRoom = (name) => {
+const convertRoomToChannel = (name) => {
   if (membersCount(name) > 1) {
     // We're dealing with an impteamnative
     return {
@@ -83,9 +83,7 @@ class KeybaseAdapter extends Adapter {
 
   /** Process every incoming message in subscription */
   process (msg) {
-    console.log(msg)
-
-    const roomName = composeRoomName(msg.channel)
+    const roomName = convertChannelToRoom(msg.channel)
     const messageID = composeMessageID(roomName, msg.id)
     const user = this.robot.brain.userForId(msg.sender.uid, {
       name: msg.sender.username,
@@ -96,19 +94,19 @@ class KeybaseAdapter extends Adapter {
     user.room = roomName
 
     if (msg.content.type === 'system') {
-      switch (msg.content.system.systemType) {
-        case 0:
-          this.robot.logger.debug('Received an EnterMessage')
-          return this.robot.receive(new msgs.EnterMessage(user, null, messageID))      
-        default:
-          console.log(msg.content.system.systemType)
-          break
-      }
+      // "User Bob was added by Alice" messages are not supported because
+      // system messages don't include UIDs.
+      return
     }
 
-    if (msg.content.type === 'unfurl') {
-      console.log(msg.content.unfurl)
-      console.log(JSON.stringify(msg.content.unfurl))
+    if (msg.content.type === 'join') {
+      this.robot.logger.debug('Received an EnterMessage')
+      return this.robot.receive(new msgs.EnterMessage(user, null, messageID))
+    }
+
+    if (msg.content.type === 'leave') {
+      this.robot.logger.debug('Received an LeaveMessage')
+      return this.robot.receive(new msgs.LeaveMessage(user, null, messageID))
     }
 
     // Direct messages prepend bot's name so Hubot can `.respond`
@@ -117,49 +115,21 @@ class KeybaseAdapter extends Adapter {
       const startOfText = (text.indexOf('@') === 0) ? 1 : 0
       const robotIsNamed = text.indexOf(this.robot.name) === startOfText ||
         text.indexOf(this.robot.alias) === startOfText
-      
+
       if (isDM && !robotIsNamed) {
         text = `${this.robot.name} ${text}`
       }
-  
-      // Standard text messages, receive as is
+
       const textMessage = new msgs.TextMessage(user, text, messageID)
       this.robot.logger.debug(`TextMessage: ${textMessage.toString()}`)
-      return this.robot.receive(textMessage)  
+      return this.robot.receive(textMessage)
     }
-
-    /*
-
-    // Room exit, receive without further detail
-    if (message.t === 'ul') {
-      this.robot.logger.debug('Message type LeaveMessage')
-      return this.robot.receive(new msgs.LeaveMessage(user, null, message._id))
-    }
-
-
-    // Attachments, format properties for Hubot
-    if (Array.isArray(message.attachments) && message.attachments.length) {
-      let attachment = message.attachments[0]
-      if (attachment.image_url) {
-        attachment.link = `${settings.host}${attachment.image_url}`
-        attachment.type = 'image'
-      } else if (attachment.audio_url) {
-        attachment.link = `${settings.host}${attachment.audio_url}`
-        attachment.type = 'audio'
-      } else if (attachment.video_url) {
-        attachment.link = `${settings.host}${attachment.video_url}`
-        attachment.type = 'video'
-      }
-      this.robot.logger.debug('Message type AttachmentMessage')
-      return this.robot.receive(new msgs.AttachmentMessage(user, attachment, message.msg, message._id))
-    }
-    */
   }
 
   /** Send messages to user addressed in envelope */
   async send (envelope, ...strings) {
     return await Promise.all(strings.map((text) => {
-      return this.keybase.chat.send(convertToRoom(envelope.room), {
+      return this.keybase.chat.send(convertRoomToChannel(envelope.room), {
         body: text,
       })
     }))
