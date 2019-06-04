@@ -24,7 +24,6 @@ kept a secret.
 |------------------|-------------|
 | `KB_USERNAME`*   | If passed, a new Keybase service will be spawned using the passed username. |
 | `KB_PAPERKEY`*   | If passed, a new Keybase service will be spawned using the passed paper key. |
-| 
 | `KB_UNFURL_MODE` | If set, [unfurling mode](#unfurling) will be changed to the passed value. |
 
 \* If you don't either `KB_USERNAME` or `KB_PAPERKEY` the adapter will
