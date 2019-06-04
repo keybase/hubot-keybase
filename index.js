@@ -52,11 +52,15 @@ class KeybaseAdapter extends Adapter {
       this.robot.logger.info(`[startup] Keybase adapter in use`)
       this.keybase = new Bot()
 
-      await this.keybase.init(
-        process.env.KB_USERNAME,
-        process.env.KB_PAPERKEY,
-        {verbose: false}
-      )
+      if (process.env.KB_USERNAME && process.env.KB_PAPERKEY) {
+        await this.keybase.init(
+          process.env.KB_USERNAME,
+          process.env.KB_PAPERKEY,
+          {verbose: false}
+        )
+      } else {
+        await this.keybase.initFromRunningService()
+      }
 
       if (process.env.KB_UNFURL_MODE) {
         await this.keybase.chat.setUnfurlSettings({
