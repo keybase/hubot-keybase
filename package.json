@@ -1,6 +1,6 @@
 {
     "name": "hubot-keybase",
-    "version": "1.0.0-development",
+    "version": "1.0.0",
     "files": [
         "index.js"
     ],
@@ -24,15 +24,15 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/keybase/keybase-hubot.git"
+        "url": "https://github.com/keybase/hubot-keybase.git"
     },
     "bugs": {
-        "url": "https://github.com/keybase/keybase-hubot/issues",
+        "url": "https://github.com/keybase/hubot-keybase/issues",
         "email": "piotr@keyba.se"
     },
     "main": "index.js",
     "dependencies": {
-        "keybase-bot": "keybase/keybase-bot#pzduniak/safe-json-stringify",
+        "keybase-bot": "^2.0.5",
         "hubot": "3"
     },
     "peerDependencies": {
