@@ -26,7 +26,7 @@ kept a secret.
 | `KB_PAPERKEY`*   | If passed, a new Keybase service will be spawned using the passed paper key. |
 | `KB_UNFURL_MODE` | If set, [unfurling mode](#unfurling) will be changed to the passed value. |
 
-\* If you don't either `KB_USERNAME` or `KB_PAPERKEY` the adapter will
+\* If you don't set either `KB_USERNAME` or `KB_PAPERKEY` the adapter will
 try to attach to an already running Keybase service. This might be
 desirable if you require support for features such as exploding messages.
 
