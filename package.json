@@ -32,7 +32,7 @@
     },
     "main": "index.js",
     "dependencies": {
-        "keybase-bot": "^2.0.5",
+        "keybase-bot": "^3.6.1",
         "hubot": "3"
     },
     "peerDependencies": {
